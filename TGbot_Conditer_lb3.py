@@ -35,13 +35,8 @@ class Client:
         self.orders.append(order)
 
 
-class Order(Product):  # Наследуем от абстрактного класса Product
-    order_counter = 1
-
+class Order:
     def __init__(self, date, time, weight, diameter, shape, color, flavor):
-        super().__init__()
-        self.order_id = Order.order_counter
-        Order.order_counter += 1
         self.date = date
         self.time = time
         self.weight = weight
@@ -50,45 +45,125 @@ class Order(Product):  # Наследуем от абстрактного кла
         self.color = color
         self.flavor = flavor
 
-    def display_info(self):  # Реализация абстрактного метода
-        return (f"Заказ ID: {self.order_id}, Дата: {self.date}, Время: {self.time}, "
+    def display_info(self):
+        return (f"Информация о заказе: Дата: {self.date}, Время: {self.time}, "
                 f"Вес: {self.weight} кг, Диаметр: {self.diameter} см, "
-                f"Форма: {self.shape}, Цвет: {self.color}, Вкус: {self.flavor.name}")
+                f"Форма: {self.shape}, Цвет: {self.color}, Вкус: {self.flavor}")
 
-    # Перегрузка оператора
+    def update_weight(self, new_weight):
+        if new_weight < 0:
+            raise ValueError("Вес не может быть отрицательным.")
+        self.weight = new_weight
+
+    def update_diameter(self, new_diameter):
+        if new_diameter < 0:
+            raise ValueError("Диаметр не может быть отрицательным.")
+        self.diameter = new_diameter
+
+    def update_shape(self, new_shape):
+        self.shape = new_shape
+
+    def update_color(self, new_color):
+        self.color = new_color
+
+    def update_flavor(self, new_flavor):
+        self.flavor = new_flavor
+
+    def update_order(self, date=None, time=None, weight=None, diameter=None,
+                     shape=None, color=None, flavor=None):
+        if date:
+            self.date = date
+        if time:
+            self.time = time
+        if weight is not None:
+            self.update_weight(weight)
+        if diameter is not None:
+            self.update_diameter(diameter)
+        if shape:
+            self.update_shape(shape)
+        if color:
+            self.update_color(color)
+        if flavor:
+            self.update_flavor(flavor)
+
     def __add__(self, other):
-        if isinstance(other, Order):
-            combined_weight = self.weight + other.weight
-            return Order(
-                date=self.date,
-                time=self.time,
-                weight=combined_weight,
-                diameter=self.diameter,
-                shape=self.shape,
-                color=self.color,
-                flavor=self.flavor
-            )
-        return NotImplemented
+        if not isinstance(other, Order):
+            raise ValueError("Сложение возможно только с другим объектом Order")
 
-    # Перегрузка оператора
+        combined_weight = self.weight + other.weight
+        combined_diameter = (self.diameter + other.diameter) / 2
+
+        return Order(
+            date=self.date,
+            time=self.time,
+            weight=combined_weight,
+            diameter=combined_diameter,
+            shape=self.shape,
+            color=self.color,
+            flavor=self.flavor
+        )
+
     def __sub__(self, other):
-        if isinstance(other, Order):
-            return Order(
-                date=self.date,
-                time=self.time,
-                weight=max(0, self.weight - other.weight),  # Не допускаем отрицательный вес
-                diameter=self.diameter,
-                shape=self.shape,
-                color=self.color,
-                flavor=self.flavor
-            )
-        return NotImplemented
+        if not isinstance(other, Order):
+            raise ValueError("Вычитание возможно только с другим объектом Order")
 
-    # Перегрузка оператора
+        weight_difference = self.weight - other.weight
+
+        return Order(
+            date=self.date,
+            time=self.time,
+            weight=weight_difference,
+            diameter=self.diameter,
+            shape=self.shape,
+            color=self.color,
+            flavor=self.flavor
+        )
+
     def __eq__(self, other):
-        if isinstance(other, Order):
-            return self.order_id == other.order_id
-        return NotImplemented
+        if not isinstance(other, Order):
+            return False
+
+        return (
+                self.date == other.date and
+                self.time == other.time and
+                self.weight == other.weight and
+                self.diameter == other.diameter and
+                self.shape == other.shape and
+                self.color == other.color and
+                self.flavor == other.flavor
+        )
+
+
+''' Пример использования:
+try:
+    catalog = ["шоколадный", "Сникерс"]
+
+    # Создание заказа
+    order1 = Order(date="2025-02-23", time="10:00", weight=2.0, diameter=25,
+                   shape="круг", color="белый", flavor=catalog[0])
+
+    print(order1.display_info())
+
+    # Обновление состояния заказа
+    order1.update_weight(2.5)
+    order1.update_diameter(30)
+    order1.update_shape("квадрат")
+    order1.update_color("красный")
+    order1.update_flavor(catalog[1])
+
+    print("После обновления:")
+    print(order1.display_info())
+
+    # Обновление нескольких атрибутов одновременно
+    order1.update_order(date="2025-02-24", time="12:00", weight=3.0)
+
+    print("После массового обновления:")
+    print(order1.display_info())
+
+except ValueError as ve:
+    print(f"Ошибка: {ve}")
+except Exception as e:
+    print(f"Произошла ошибка: {e}")'''
 
 
 class Catalog(Product):  # Наследуем от абстрактного класса Product
