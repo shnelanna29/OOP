@@ -1,12 +1,15 @@
 from abc import ABC, abstractmethod
 
-# Абстрактный класс
+
+# Абстрактный класс для продукта
 class Product(ABC):
     @abstractmethod
     def display_info(self):
         pass
 
+
 class Client:
+    total_clients = 0
     def __init__(self, client_id, name, phone_number, address):
         self.client_id = client_id
         self.name = name
@@ -14,39 +17,83 @@ class Client:
         self.address = address
         self.orders = []
 
+        Client.total_clients += 1
+
     @staticmethod
-    def from_input():
+    def from_input(client_id):
+        print(f"\nВведите данные для клиента #{client_id}:")
         name = input("Введите полное имя клиента: ")
         phone_number = input("Введите номер телефона клиента: ")
         address = input("Введите адрес клиента: ")
-        return name, phone_number, address
+        return Client(client_id, name, phone_number, address)
+
+    @classmethod
+    def get_total_clients(cls):
+        return cls.total_clients
 
     def add_order(self, order):
         self.orders.append(order)
 
-    def remove_order(self, order_id):
-        self.orders = [order for order in self.orders if order.order_id != order_id]
 
 class Order(Product):  # Наследуем от абстрактного класса Product
-    def __init__(self, order_id, date, time, weight, diameter, shape, color, flavor):
-        super().__init__()  # Вызов конструктора родительского класса
-        self.order_id = order_id
+    order_counter = 1
+
+    def __init__(self, date, time, weight, diameter, shape, color, flavor):
+        super().__init__()
+        self.order_id = Order.order_counter
+        Order.order_counter += 1
         self.date = date
         self.time = time
         self.weight = weight
         self.diameter = diameter
         self.shape = shape
         self.color = color
-        self.flavor = flavor  # Ссылка на объект из класса Catalog
+        self.flavor = flavor
 
     def display_info(self):  # Реализация абстрактного метода
         return (f"Заказ ID: {self.order_id}, Дата: {self.date}, Время: {self.time}, "
                 f"Вес: {self.weight} кг, Диаметр: {self.diameter} см, "
                 f"Форма: {self.shape}, Цвет: {self.color}, Вкус: {self.flavor.name}")
 
+    # Перегрузка оператора
+    def __add__(self, other):
+        if isinstance(other, Order):
+            combined_weight = self.weight + other.weight
+            return Order(
+                date=self.date,
+                time=self.time,
+                weight=combined_weight,
+                diameter=self.diameter,
+                shape=self.shape,
+                color=self.color,
+                flavor=self.flavor
+            )
+        return NotImplemented
+
+    # Перегрузка оператора
+    def __sub__(self, other):
+        if isinstance(other, Order):
+            return Order(
+                date=self.date,
+                time=self.time,
+                weight=max(0, self.weight - other.weight),  # Не допускаем отрицательный вес
+                diameter=self.diameter,
+                shape=self.shape,
+                color=self.color,
+                flavor=self.flavor
+            )
+        return NotImplemented
+
+    # Перегрузка оператора
+    def __eq__(self, other):
+        if isinstance(other, Order):
+            return self.order_id == other.order_id
+        return NotImplemented
+
+
 class Catalog(Product):  # Наследуем от абстрактного класса Product
     def __init__(self, name, image_url, ingredients):
-        super().__init__()  # Вызов конструктора родительского класса
+        super().__init__()
         self.name = name
         self.image_url = image_url
         self.ingredients = ingredients
@@ -55,33 +102,14 @@ class Catalog(Product):  # Наследуем от абстрактного кл
         return (f"Торт: {self.name}, Фото: {self.image_url}, "
                 f"Ингредиенты: {', '.join(self.ingredients)}")
 
-class Confectioner:
-    def __init__(self, name, schedule):
-        self.name = name
-        self.schedule = schedule
-
-    def display_info(self):
-        return f"Кондитер: {self.name}, Расписание: {', '.join(self.schedule)}"
 
 class Booking:
     def __init__(self, available_times):
         self.available_times = available_times
-        self.client = None
-        self.order = None
 
     def book(self, client, order):
         if order.time in self.available_times:
-            self.client = client
-            self.order = order
             self.available_times.remove(order.time)
-            return True
-        return False
-
-    def cancel(self):
-        if self.order:
-            self.available_times.append(self.order.time)
-            self.client = None
-            self.order = None
             return True
         return False
 
@@ -94,44 +122,76 @@ def main():
         Catalog("Торт Сникерс", "url_to_image2", ["мука", "сахар", "карамель", "арахис"]),
     ]
 
-    confectioner = Confectioner("Анна", ["Пн-Вс: 10:00-16:00"])
-
-    number_of_clients = int(input("Введите количество клиентов: "))
-    for i in range(number_of_clients):
-        print(f"\nКлиент {i + 1}:")
-        name, phone_number, address = Client.from_input()
-        client = Client(i + 1, name, phone_number, address)
-        clients.append(client)
-
-    print("\nСписок клиентов:")
-    for client in clients:
-        print(f"{client.name}, Телефон: {client.phone_number}, Адрес: {client.address}")
-
     booking = Booking(["10:00", "11:00", "12:00", "13:00", "14:00"])
 
-    for client in clients:
-        order_id = int(input(f"\nВведите ID заказа для клиента {client.name}: "))
+    print("Добавление клиентов и заказов.")
+
+    client_id = 1
+
+    while True:
+        client = Client.from_input(client_id)
+        clients.append(client)
+
+        print("\nСоздаем заказ для клиента:")
+
         date = input("Введите дату заказа (гггг-мм-дд): ")
+
         time = input("Введите время заказа (чч:мм): ")
-        
+
         weight = float(input("Введите вес торта (кг): "))
+
         diameter = float(input("Введите диаметр торта (см): "))
-        
+
         shape = input("Введите форму торта (круг, квадрат, сердце): ")
-        
+
         color = input("Введите цвет торта: ")
 
-        # Предполагается использование первого элемента каталога как вкус для примера.
-        flavor_catalog_item = catalog[0]  
-        
-        order = Order(order_id, date, time, weight, diameter, shape, color, flavor_catalog_item)
-        
-        client.add_order(order)
-        
-        if booking.book(client, order):
-            print(f"Заказ для клиента {client.name} успешно забронирован на время {time}.")
-            print(order.display_info())
-            print(flavor_catalog_item.display_info())
-    
-# Запуск главной функции (раскомментируйте для запуска)
-# main()
+        print("\nДоступные вкусы тортов:")
+
+
+        for index, item in enumerate(catalog):
+            print(f"{index + 1}. {item.display_info()}")
+
+        flavor_choice = int(input("Выберите вкус торта (введите номер): ")) - 1
+
+        if 0 <= flavor_choice < len(catalog):
+            flavor_catalog_item = catalog[flavor_choice]
+            order = Order(date, time, weight, diameter, shape, color, flavor_catalog_item)
+
+            client.add_order(order)
+
+            if booking.book(client, order):
+                print(f"Заказ для клиента {client.name} успешно забронирован на время {time}.")
+                print(order.display_info())
+
+                # Демонстрация перегруженных операторов.
+                if len(client.orders) > 1:
+                    combined_order = client.orders[-1] + client.orders[-2]
+                    print("\nОбъединенный заказ:")
+                    print(combined_order.display_info())
+
+                    difference_order = client.orders[-1] - client.orders[-2]
+                    print("\nЗаказ с вычитанием веса:")
+                    print(difference_order.display_info())
+
+                    is_equal = client.orders[-1] == client.orders[-2]
+                    print(f"\nЗаказы равны по ID? {'Да' if is_equal else 'Нет'}")
+
+            else:
+                print(f"Не удалось забронировать время для клиента {client.name}.")
+
+        else:
+            print("Неверный выбор вкуса. Заказ не создан.")
+
+        client_id += 1
+
+        another_client = input("\nХотите добавить еще одного клиента? (да/нет): ").strip().lower()
+        if another_client != 'да':
+            break
+
+
+print(f"\nОбщее количество клиентов: {Client.get_total_clients()}")
+
+
+if __name__ == "__main__":
+    main()
