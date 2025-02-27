@@ -1,10 +1,18 @@
 from abc import ABC, abstractmethod
 
+# Базовый класс исключений
+class BaseError(Exception):
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
 
-class Product(ABC):
-    @abstractmethod
-    def display_info(self):
-        pass
+class InvalidOrderError(BaseError):
+    def __init__(self, message):
+        super().__init__(message)
+
+class InvalidClientDataError(BaseError):
+    def __init__(self, message):
+        super().__init__(message)
 
 
 class ProductItem:
@@ -43,16 +51,34 @@ class Client:
     def add_order(self, order):
         self.orders.append(order)
 
+    def __str__(self):
+        return f"Клиент ID: {self.client_id}, Имя: {self.name}, Телефон: {self.phone_number}, Адрес: {self.address}"
+
+    def __repr__(self):
+        return f"Client({self.client_id}, '{self.name}', '{self.phone_number}', '{self.address}')"
+
 
 class Order:
     def __init__(self, date, time, weight, product_name):
-        self.date = date
-        self.time = time
-        self.weight = weight
+        self._date = date
+        self._time = time
+        self._weight = weight
         self.product_name = product_name
 
     def display_info(self):
-        return f"Информация о заказе: Дата: {self.date}, Время: {self.time}, Вес: {self.weight} кг, Товар: {self.product_name}"
+        return f"Информация о заказе: Дата: {self._date}, Время: {self._time}, Вес: {self._weight} кг, Товар: {self.product_name}"
+
+    def get_date(self):
+        return self._date
+
+    def get_time(self):
+        return self._time
+
+    def __str__(self):
+        return self.display_info()
+
+    def __repr__(self):
+        return f"Order('{self._date}', '{self._time}', {self._weight}, '{self.product_name}')"
 
 
 class SpecialOrder(Order):
@@ -64,28 +90,32 @@ class SpecialOrder(Order):
         base_info = super().display_info()
         return f"{base_info}, Специальная просьба: {self.special_request}"
 
+    def process_order_info(self, priority="special"):
+        if priority == "special":
+            print("Приоритет специального заказа:")
+            print(self.display_info())
+            super().display_info()
+        else:
+            print("Приоритет базового заказа:")
+            super().display_info()
+            print(self.display_info())
+
+    def __str__(self):
+        return self.display_info()
+
+    def __repr__(self):
+        return f"SpecialOrder('{self._date}', '{self._time}', {self._weight}, '{self.product_name}', '{self.special_request}')"
+
 
 class Booking:
     def __init__(self, available_times):
         self.available_times = available_times
 
     def book(self, client, order):
-        if order.time in self.available_times:
-            self.available_times.remove(order.time)
+        if order.get_time() in self.available_times:
+            self.available_times.remove(order.get_time())
             return True
         return False
-
-
-class InvalidOrderError(Exception):
-    def __init__(self, message):
-        self.message = message
-        super().__init__(self.message)
-
-
-class InvalidClientDataError(Exception):
-    def __init__(self, message):
-        self.message = message
-        super().__init__(self.message)
 
 
 def create_product_list():
@@ -103,9 +133,45 @@ def create_product_list():
     return product_list
 
 
-# Основная функция
+def find_max_attribute_item(two_dim_list, attribute_name):
+    if not two_dim_list:
+        return None
+
+    max_item = None
+    max_value = float('-inf')
+
+    for row in two_dim_list:
+        for item in row:
+            attribute_value = getattr(item, attribute_name, None)
+            if attribute_value is not None and attribute_value > max_value:
+                max_value = attribute_value
+                max_item = item
+
+    return max_item
+
+
 def main():
     product_list = create_product_list()
+
+    # Пример работы с двумерным списком
+    two_dim_list = [
+        [
+            ProductItem("Торт", 500),
+            ProductItem("Пирожное", 100),
+            ProductItem("Капкейк", 50)
+        ],
+        [
+            ProductItem("Маффин", 200),
+            ProductItem("Булочка", 150),
+            ProductItem("Печенье", 75)
+        ]
+    ]
+
+    max_price_item = find_max_attribute_item(two_dim_list, 'price')
+    if max_price_item:
+        print(f"\nТовар с максимальной ценой: {max_price_item.display_info()}")
+    else:
+        print("\nСписок пуст или атрибут не найден.")
 
     clients = []
     booking = Booking(["10:00", "11:00", "12:00", "13:00", "14:00"])
