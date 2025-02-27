@@ -64,18 +64,19 @@ class Client:
 
 
 class Order:
-    def __init__(self, date, time, weight, diameter, color, product_name):
+    def __init__(self, date, time, weight, diameter, color, shape, product_name):
         self._date = date
         self._time = time
         self._weight = weight
         self._diameter = diameter
         self._color = color
+        self._shape = shape
         self.product_name = product_name
 
     def display_info(self):
         return (f"Информация о заказе: Дата: {self._date}, Время: {self._time}, "
                 f"Вес: {self._weight} кг, Диаметр: {self._diameter} см, "
-                f"Цвет: {self._color}, Товар: {self.product_name}")
+                f"Цвет: {self._color}, Форма: {self._shape}, Товар: {self.product_name}")
 
     def get_date(self):
         return self._date
@@ -87,12 +88,12 @@ class Order:
         return self.display_info()
 
     def __repr__(self):
-        return f"Order('{self._date}', '{self._time}', {self._weight}, {self._diameter}, '{self._color}', '{self.product_name}')"
+        return f"Order('{self._date}', '{self._time}', {self._weight}, {self._diameter}, '{self._color}', '{self._shape}', '{self.product_name}')"
 
 
 class SpecialOrder(Order):
-    def __init__(self, date, time, weight, diameter, color, product_name, special_request):
-        super().__init__(date, time, weight, diameter, color, product_name)
+    def __init__(self, date, time, weight, diameter, color, shape, product_name, special_request):
+        super().__init__(date, time, weight, diameter, color, shape, product_name)
         self.special_request = special_request
 
     def display_info(self):
@@ -113,7 +114,7 @@ class SpecialOrder(Order):
         return self.display_info()
 
     def __repr__(self):
-        return f"SpecialOrder('{self._date}', '{self._time}', {self._weight}, {self._diameter}, '{self._color}', '{self.product_name}', '{self.special_request}')"
+        return f"SpecialOrder('{self._date}', '{self._time}', {self._weight}, {self._diameter}, '{self._color}', '{self._shape}', '{self.product_name}', '{self.special_request}')"
 
 
 class Booking:
@@ -212,6 +213,24 @@ def main():
 
             color = input("Введите цвет товара: ")
 
+            print("\nВыберите форму торта:")
+            print("1. Круг")
+            print("2. Квадрат")
+            print("3. Сердце")
+            try:
+                shape_choice = int(input("Введите номер формы: "))
+            except ValueError:
+                raise InvalidOrderError("Некорректный выбор формы.")
+
+            if shape_choice == 1:
+                shape = "круг"
+            elif shape_choice == 2:
+                shape = "квадрат"
+            elif shape_choice == 3:
+                shape = "сердце"
+            else:
+                raise InvalidOrderError("Неверный выбор формы.")
+
             print("\nВыберите товар:")
             for index, item in enumerate(product_list):
                 print(f"{index + 1}. {item.display_info()}")
@@ -226,9 +245,9 @@ def main():
                 special_request = input("Введите специальную просьбу (если есть): ")
 
                 if special_request:
-                    order = SpecialOrder(date, time, weight, diameter, color, product_name, special_request)
+                    order = SpecialOrder(date, time, weight, diameter, color, shape, product_name, special_request)
                 else:
-                    order = Order(date, time, weight, diameter, color, product_name)
+                    order = Order(date, time, weight, diameter, color, shape, product_name)
 
                 client.add_order(order)
 
