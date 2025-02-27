@@ -64,14 +64,18 @@ class Client:
 
 
 class Order:
-    def __init__(self, date, time, weight, product_name):
+    def __init__(self, date, time, weight, diameter, color, product_name):
         self._date = date
         self._time = time
         self._weight = weight
+        self._diameter = diameter
+        self._color = color
         self.product_name = product_name
 
     def display_info(self):
-        return f"Информация о заказе: Дата: {self._date}, Время: {self._time}, Вес: {self._weight} кг, Товар: {self.product_name}"
+        return (f"Информация о заказе: Дата: {self._date}, Время: {self._time}, "
+                f"Вес: {self._weight} кг, Диаметр: {self._diameter} см, "
+                f"Цвет: {self._color}, Товар: {self.product_name}")
 
     def get_date(self):
         return self._date
@@ -83,12 +87,12 @@ class Order:
         return self.display_info()
 
     def __repr__(self):
-        return f"Order('{self._date}', '{self._time}', {self._weight}, '{self.product_name}')"
+        return f"Order('{self._date}', '{self._time}', {self._weight}, {self._diameter}, '{self._color}', '{self.product_name}')"
 
 
 class SpecialOrder(Order):
-    def __init__(self, date, time, weight, product_name, special_request):
-        super().__init__(date, time, weight, product_name)
+    def __init__(self, date, time, weight, diameter, color, product_name, special_request):
+        super().__init__(date, time, weight, diameter, color, product_name)
         self.special_request = special_request
 
     def display_info(self):
@@ -109,7 +113,7 @@ class SpecialOrder(Order):
         return self.display_info()
 
     def __repr__(self):
-        return f"SpecialOrder('{self._date}', '{self._time}', {self._weight}, '{self.product_name}', '{self.special_request}')"
+        return f"SpecialOrder('{self._date}', '{self._time}', {self._weight}, {self._diameter}, '{self._color}', '{self.product_name}', '{self.special_request}')"
 
 
 class Booking:
@@ -201,6 +205,13 @@ def main():
             except ValueError:
                 raise InvalidOrderError("Некорректный вес товара.")
 
+            try:
+                diameter = float(input("Введите диаметр товара (см): "))
+            except ValueError:
+                raise InvalidOrderError("Некорректный диаметр товара.")
+
+            color = input("Введите цвет товара: ")
+
             print("\nВыберите товар:")
             for index, item in enumerate(product_list):
                 print(f"{index + 1}. {item.display_info()}")
@@ -215,9 +226,9 @@ def main():
                 special_request = input("Введите специальную просьбу (если есть): ")
 
                 if special_request:
-                    order = SpecialOrder(date, time, weight, product_name, special_request)
+                    order = SpecialOrder(date, time, weight, diameter, color, product_name, special_request)
                 else:
-                    order = Order(date, time, weight, product_name)
+                    order = Order(date, time, weight, diameter, color, product_name)
 
                 client.add_order(order)
 
