@@ -33,36 +33,40 @@ class Client:
     def add_order(self, order):
         self.orders.append(order)
 
+
 class BaseOrder:
     def __init__(self, date, time, weight, diameter, shape, color, flavor):
         self.date = date
         self.time = time
-        self.weight = weight
-        self.diameter = diameter
+        self._weight = weight  
+        self._diameter = diameter  
         self.shape = shape
         self.color = color
         self.flavor = flavor
 
     def display_info(self):
         return (f"Информация о заказе: Дата: {self.date}, Время: {self.time}, "
-                f"Вес: {self.weight} кг, Диаметр: {self.diameter} см, "
+                f"Вес: {self._weight} кг, Диаметр: {self._diameter} см, "
                 f"Форма: {self.shape}, Цвет: {self.color}, Вкус: {self.flavor}")
 
     def update_weight(self, new_weight):
         if new_weight < 0:
             raise ValueError("Вес не может быть отрицательным.")
-        self.weight = new_weight
+        self._weight = new_weight
 
     def update_diameter(self, new_diameter):
         if new_diameter < 0:
             raise ValueError("Диаметр не может быть отрицательным.")
-        self.diameter = new_diameter
+        self._diameter = new_diameter
 
     def print_base_info(self):
         print("Это базовый заказ")
 
+
+
 class SpecialOrder(BaseOrder):
     def __init__(self, date, time, weight, diameter, shape, color, flavor, special_request):
+        # Вызов конструктора базового класса через super()
         super().__init__(date, time, weight, diameter, shape, color, flavor)
         self.special_request = special_request
 
@@ -77,24 +81,20 @@ class SpecialOrder(BaseOrder):
         super().print_base_info()  
         print(f"Специальная просьба: {self.special_request}")
 
-    def process_order_info(self, priority="special"):
-        if priority == "special":
-            print("Приоритет специального заказа:")
-            print(self.display_info())
-            super().print_base_info()
-        else:
-            print("Приоритет базового заказа:")
-            super().print_base_info()
-            print(self.display_info())
+    def access_protected_attributes(self):
+        # Доступ к защищенным атрибутам в производном классе
+        print(f"Вес: {self._weight} кг")
+        print(f"Диаметр: {self._diameter} см")
 
-class Catalog(Product): 
+
+class Catalog(Product):  
     def __init__(self, name, image_url, ingredients):
         super().__init__()
         self.name = name
         self.image_url = image_url
         self.ingredients = ingredients
 
-    def display_info(self):  
+    def display_info(self): 
         return (f"Торт: {self.name}, Фото: {self.image_url}, "
                 f"Ингредиенты: {', '.join(self.ingredients)}")
 
@@ -131,7 +131,7 @@ def main():
 
     booking = Booking(["10:00", "11:00", "12:00", "13:00", "14:00"])
 
-    print("Добавление клиентов и заказов")
+    print("Добавление клиентов и заказов.")
 
     client_id = 1
 
@@ -188,8 +188,7 @@ def main():
                     print(order.display_info())
 
                     if isinstance(order, SpecialOrder):
-                        order.process_order_info(priority="special")  
-                        order.process_order_info(priority="base")  
+                        order.access_protected_attributes()  
 
                 else:
                     raise InvalidOrderError("Не удалось забронировать время для клиента.")
