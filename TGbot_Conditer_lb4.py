@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 
-# Базовый класс исключений
 class BaseError(Exception):
     def __init__(self, message):
         self.message = message
@@ -15,7 +14,13 @@ class InvalidClientDataError(BaseError):
         super().__init__(message)
 
 
-class ProductItem:
+class Product(ABC):
+    @abstractmethod
+    def display_info(self):
+        pass
+
+
+class ProductItem(Product):
     def __init__(self, name, price):
         self.name = name
         self.price = price
@@ -120,14 +125,14 @@ class Booking:
 
 def create_product_list():
     product_list = [
-        {"name": "Торт Шоколадный", "price": 500},
-        {"name": "Торт ванильный", "price": 480},
-        {"name": "Сложный декор", "price": 200}
+        ProductItem("Торт Шоколадный", 500),
+        ProductItem("Торт ванильный", 480),
+        ProductItem("Сложный декор", 200)
     ]
 
     print("Список доступных товаров:")
     for index, item in enumerate(product_list):
-        print(f"{index + 1}. {item['name']}: {item['price']} руб/кг")
+        print(f"{index + 1}. {item.display_info()}")
     print()
 
     return product_list
@@ -153,7 +158,6 @@ def find_max_attribute_item(two_dim_list, attribute_name):
 def main():
     product_list = create_product_list()
 
-    # Пример работы с двумерным списком
     two_dim_list = [
         [
             ProductItem("Торт", 500),
@@ -199,7 +203,7 @@ def main():
 
             print("\nВыберите товар:")
             for index, item in enumerate(product_list):
-                print(f"{index + 1}. {item['name']}")
+                print(f"{index + 1}. {item.display_info()}")
 
             try:
                 product_choice = int(input("Введите номер товара: ")) - 1
@@ -207,7 +211,7 @@ def main():
                 raise InvalidOrderError("Некорректный выбор товара.")
 
             if 0 <= product_choice < len(product_list):
-                product_name = product_list[product_choice]['name']
+                product_name = product_list[product_choice].name
                 special_request = input("Введите специальную просьбу (если есть): ")
 
                 if special_request:
