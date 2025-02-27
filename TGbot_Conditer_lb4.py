@@ -1,9 +1,19 @@
 from abc import ABC, abstractmethod
 
+
 class Product(ABC):
     @abstractmethod
     def display_info(self):
         pass
+
+
+class ProductItem:
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+
+    def display_info(self):
+        return f"Товар: {self.name}, Цена: {self.price} руб."
 
 
 class Client:
@@ -33,94 +43,26 @@ class Client:
     def add_order(self, order):
         self.orders.append(order)
 
-    def __str__(self):
-        return f"Клиент ID: {self.client_id}, Имя: {self.name}, Телефон: {self.phone_number}, Адрес: {self.address}"
 
-    def __repr__(self):
-        return f"Client({self.client_id}, '{self.name}', '{self.phone_number}', '{self.address}')"
-
-
-class BaseOrder:
-    def __init__(self, date, time, weight, diameter, shape, color, flavor):
+class Order:
+    def __init__(self, date, time, weight, product_name):
         self.date = date
         self.time = time
-        self._weight = weight
-        self._diameter = diameter
-        self.shape = shape
-        self.color = color
-        self.flavor = flavor
+        self.weight = weight
+        self.product_name = product_name
 
     def display_info(self):
-        return (f"Информация о заказе: Дата: {self.date}, Время: {self.time}, "
-                f"Вес: {self._weight} кг, Диаметр: {self._diameter} см, "
-                f"Форма: {self.shape}, Цвет: {self.color}, Вкус: {self.flavor}")
-
-    def update_weight(self, new_weight):
-        if new_weight < 0:
-            raise ValueError("Вес не может быть отрицательным.")
-        self._weight = new_weight
-
-    def update_diameter(self, new_diameter):
-        if new_diameter < 0:
-            raise ValueError("Диаметр не может быть отрицательным.")
-        self._diameter = new_diameter
-
-    def print_base_info(self):
-        print("Это базовый заказ")
-
-    def __str__(self):
-        return self.display_info()
-
-    def __repr__(self):
-        return f"BaseOrder('{self.date}', '{self.time}', {self._weight}, {self._diameter}, '{self.shape}', '{self.color}', '{self.flavor}')"
+        return f"Информация о заказе: Дата: {self.date}, Время: {self.time}, Вес: {self.weight} кг, Товар: {self.product_name}"
 
 
-class SpecialOrder(BaseOrder):
-    def __init__(self, date, time, weight, diameter, shape, color, flavor, special_request):
-        # Вызов конструктора базового класса через super()
-        super().__init__(date, time, weight, diameter, shape, color, flavor)
+class SpecialOrder(Order):
+    def __init__(self, date, time, weight, product_name, special_request):
+        super().__init__(date, time, weight, product_name)
         self.special_request = special_request
 
     def display_info(self):
         base_info = super().display_info()
         return f"{base_info}, Специальная просьба: {self.special_request}"
-
-    def add_special_decoration(self, decoration):
-        self.special_request += f", Дополнительная декорация: {decoration}"
-
-    def print_special_info(self):
-        super().print_base_info()
-        print(f"Специальная просьба: {self.special_request}")
-
-    def access_protected_attributes(self):
-        # Доступ к защищенным атрибутам в производном классе
-        print(f"Вес: {self._weight} кг")
-        print(f"Диаметр: {self._diameter} см")
-
-    def __str__(self):
-        return self.display_info()
-
-    def __repr__(self):
-        return f"SpecialOrder('{self.date}', '{self.time}', {self._weight}, {self._diameter}, '{self.shape}', '{self.color}', '{self.flavor}', '{self.special_request}')"
-
-
-class Catalog(Product):
-    def __init__(self, name, image_url, ingredients):
-        super().__init__()
-        self.name = name
-        self.image_url = image_url
-        self.ingredients = ingredients
-
-    def display_info(self):
-        return (f"Торт: {self.name}, Фото: {self.image_url}, "
-                f"Ингредиенты: {', '.join(self.ingredients)}")
-
-    def __str__(self):
-        return self.display_info()
-
-    def __repr__(self):
-        ingredients_str = ', '.join(f"'{i}'" for i in self.ingredients)
-        return f"Catalog('{self.name}', '{self.image_url}', [{ingredients_str}])"
 
 
 class Booking:
@@ -132,13 +74,6 @@ class Booking:
             self.available_times.remove(order.time)
             return True
         return False
-
-    def __str__(self):
-        return f"Доступные времена: {', '.join(self.available_times)}"
-
-    def __repr__(self):
-        times_str = ', '.join(f"'{t}'" for t in self.available_times)
-        return f"Booking([{times_str}])"
 
 
 class InvalidOrderError(Exception):
@@ -153,17 +88,29 @@ class InvalidClientDataError(Exception):
         super().__init__(self.message)
 
 
-def main():
-    clients = []
-
-    catalog = [
-        Catalog("Шоколадный торт", "url_to_image1", ["мука", "сахар", "какао", "яйца"]),
-        Catalog("Торт Сникерс", "url_to_image2", ["мука", "сахар", "карамель", "арахис"]),
+def create_product_list():
+    product_list = [
+        {"name": "Торт Шоколадный", "price": 500},
+        {"name": "Торт ванильный", "price": 480},
+        {"name": "Сложный декор", "price": 200}
     ]
 
+    print("Список доступных товаров:")
+    for index, item in enumerate(product_list):
+        print(f"{index + 1}. {item['name']}: {item['price']} руб/кг")
+    print()
+
+    return product_list
+
+
+# Основная функция
+def main():
+    product_list = create_product_list()
+
+    clients = []
     booking = Booking(["10:00", "11:00", "12:00", "13:00", "14:00"])
 
-    print("Добавление клиентов и заказов.")
+    print("Добавление клиентов и заказов")
 
     client_id = 1
 
@@ -177,56 +124,42 @@ def main():
             print("\nСоздаем заказ для клиента:")
 
             date = input("Введите дату заказа (гггг-мм-дд): ")
-
             time = input("Введите время заказа (чч:мм): ")
 
             try:
-                weight = float(input("Введите вес торта (кг): "))
+                weight = float(input("Введите вес товара (кг): "))
             except ValueError:
-                raise InvalidOrderError("Некорректный вес торта.")
+                raise InvalidOrderError("Некорректный вес товара.")
+
+            print("\nВыберите товар:")
+            for index, item in enumerate(product_list):
+                print(f"{index + 1}. {item['name']}")
 
             try:
-                diameter = float(input("Введите диаметр торта (см): "))
+                product_choice = int(input("Введите номер товара: ")) - 1
             except ValueError:
-                raise InvalidOrderError("Некорректный диаметр торта.")
+                raise InvalidOrderError("Некорректный выбор товара.")
 
-            shape = input("Введите форму торта (круг, квадрат, сердце): ")
-
-            color = input("Введите цвет торта: ")
-
-            print("\nДоступные вкусы тортов:")
-
-            for index, item in enumerate(catalog):
-                print(f"{index + 1}. {item}")
-
-            try:
-                flavor_choice = int(input("Выберите вкус торта (введите номер): ")) - 1
-            except ValueError:
-                raise InvalidOrderError("Некорректный выбор вкуса.")
-
-            if 0 <= flavor_choice < len(catalog):
-                flavor_catalog_item = catalog[flavor_choice]
+            if 0 <= product_choice < len(product_list):
+                product_name = product_list[product_choice]['name']
                 special_request = input("Введите специальную просьбу (если есть): ")
 
                 if special_request:
-                    order = SpecialOrder(date, time, weight, diameter, shape, color, flavor_catalog_item.name, special_request)
+                    order = SpecialOrder(date, time, weight, product_name, special_request)
                 else:
-                    order = BaseOrder(date, time, weight, diameter, shape, color, flavor_catalog_item.name)
+                    order = Order(date, time, weight, product_name)
 
                 client.add_order(order)
 
                 if booking.book(client, order):
                     print(f"Заказ для клиента {client.name} успешно забронирован на время {time}.")
-                    print(order)
-
-                    if isinstance(order, SpecialOrder):
-                        order.access_protected_attributes()
+                    print(order.display_info())
 
                 else:
                     raise InvalidOrderError("Не удалось забронировать время для клиента.")
 
             else:
-                raise InvalidOrderError("Неверный выбор вкуса.")
+                raise InvalidOrderError("Неверный выбор товара.")
 
         except InvalidClientDataError as e:
             print(f"Ошибка клиента: {e}")
