@@ -20,7 +20,7 @@ class Product(ABC):
         pass
 
 
-class ProductItem(Product):
+class Catalog(Product):
     def __init__(self, name, price):
         self.name = name
         self.price = price
@@ -130,9 +130,9 @@ class Booking:
 
 def create_product_list():
     product_list = [
-        ProductItem("Торт Шоколадный", 500),
-        ProductItem("Торт ванильный", 480),
-        ProductItem("Сложный декор", 200)
+        Catalog("Торт Шоколадный", 500),
+        Catalog("Торт ванильный", 480),
+        Catalog("Сложный декор", 200)
     ]
 
     print("Список доступных товаров:")
@@ -162,25 +162,6 @@ def find_max_attribute_item(two_dim_list, attribute_name):
 
 def main():
     product_list = create_product_list()
-
-    two_dim_list = [
-        [
-            ProductItem("Торт", 500),
-            ProductItem("Пирожное", 100),
-            ProductItem("Капкейк", 50)
-        ],
-        [
-            ProductItem("Маффин", 200),
-            ProductItem("Булочка", 150),
-            ProductItem("Печенье", 75)
-        ]
-    ]
-
-    max_price_item = find_max_attribute_item(two_dim_list, 'price')
-    if max_price_item:
-        print(f"\nТовар с максимальной ценой: {max_price_item.display_info()}")
-    else:
-        print("\nСписок пуст или атрибут не найден.")
 
     clients = []
     booking = Booking(["10:00", "11:00", "12:00", "13:00", "14:00"])
