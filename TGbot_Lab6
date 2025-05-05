@@ -1,0 +1,521 @@
+import sys
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QStackedWidget,
+                             QLabel, QLineEdit, QPushButton, QDateEdit, QTimeEdit,
+                             QComboBox, QTextEdit, QHBoxLayout)
+from PyQt5.QtCore import Qt, QDate, QTime
+from PyQt5.QtGui import QPixmap, QPainter
+
+
+class ClientDataForm(QWidget):
+    def __init__(self, stacked_widget, order_data):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        self.order_data = order_data
+        self.init_ui()
+
+    def init_ui(self):
+        layout = QVBoxLayout(self)
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setContentsMargins(100, 50, 100, 50)
+
+        # Title label
+        self.title_label = QLabel("Введите данные клиента")
+        self.title_label.setAlignment(Qt.AlignCenter)
+
+        # Input fields
+        self.name_input = QLineEdit()
+        self.name_input.setPlaceholderText("Имя")
+        self.phone_input = QLineEdit()
+        self.phone_input.setPlaceholderText("Телефон")
+        self.address_input = QLineEdit()
+        self.address_input.setPlaceholderText("Адрес")
+
+        # Next button
+        self.next_button = QPushButton("Далее")
+        self.next_button.clicked.connect(self.go_to_cake_selection)
+
+        # Add widgets to layout
+        layout.addWidget(self.title_label)
+        layout.addSpacing(30)
+        layout.addWidget(self.name_input)
+        layout.addSpacing(15)
+        layout.addWidget(self.phone_input)
+        layout.addSpacing(15)
+        layout.addWidget(self.address_input)
+        layout.addSpacing(30)
+        layout.addWidget(self.next_button, alignment=Qt.AlignCenter)
+
+        # Set fixed sizes for elements
+        self.title_label.setFixedHeight(80)
+        self.name_input.setFixedHeight(50)
+        self.phone_input.setFixedHeight(50)
+        self.address_input.setFixedHeight(50)
+        self.next_button.setFixedSize(200, 50)
+
+        # Apply styles
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #CFACF4;
+            }
+            QLabel {
+                font-family: Arial;
+                font-weight: bold;
+                font-size: 28px;
+                color: #000000;
+            }
+            QLineEdit {
+                background-color: #FFFFFF;
+                border-radius: 10px;
+                font-family: Arial;
+                font-size: 16px;
+                color: #000000;
+                padding: 10px;
+                border: 2px solid #9B59B6;
+            }
+            QPushButton {
+                background-color: #4CAF50;
+                border-radius: 10px;
+                font-family: Arial;
+                font-weight: bold;
+                font-size: 18px;
+                color: #FFFFFF;
+                border: none;
+                padding: 10px 20px;
+            }
+            QPushButton:hover {
+                background-color: #45a049;
+            }
+            QPushButton:pressed {
+                background-color: #3d8b40;
+            }
+        """)
+
+
+    def go_to_cake_selection(self):
+        if all([self.name_input.text(), self.phone_input.text(), self.address_input.text()]):
+            self.order_data['name'] = self.name_input.text()
+            self.order_data['phone'] = self.phone_input.text()
+            self.order_data['address'] = self.address_input.text()
+            self.stacked_widget.setCurrentIndex(1)
+
+
+class CakeSelectionForm(QWidget):
+    def __init__(self, stacked_widget, order_data):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        self.order_data = order_data
+        self.init_ui()
+
+    def init_ui(self):
+        layout = QVBoxLayout(self)
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setContentsMargins(100, 50, 100, 50)
+
+        # Title label
+        self.title_label = QLabel("Выберите параметры торта")
+        self.title_label.setAlignment(Qt.AlignCenter)
+
+        # Shape selection
+        self.shape_label = QLabel("Форма торта:")
+        self.shape_combo = QComboBox()
+        self.shape_combo.addItems(["Круг", "Квадрат", "Прямоугольник", "Сердце", "Фигурный"])
+
+        # Flavor selection
+        self.flavor_label = QLabel("Вкус торта:")
+        self.flavor_combo = QComboBox()
+        self.flavor_combo.addItems(
+            ["Ванильный", "Шоколадный", "Красный бархат", "Фруктовый", "Кофейный", "Карамельный"])
+
+        # Next button
+        self.next_button = QPushButton("Далее")
+        self.next_button.clicked.connect(self.go_to_order_details)
+
+        # Add widgets to layout
+        layout.addWidget(self.title_label)
+        layout.addSpacing(30)
+        layout.addWidget(self.shape_label)
+        layout.addWidget(self.shape_combo)
+        layout.addSpacing(15)
+        layout.addWidget(self.flavor_label)
+        layout.addWidget(self.flavor_combo)
+        layout.addSpacing(30)
+        layout.addWidget(self.next_button, alignment=Qt.AlignCenter)
+
+        # Set fixed sizes for elements
+        self.title_label.setFixedHeight(80)
+        self.shape_combo.setFixedHeight(40)
+        self.flavor_combo.setFixedHeight(40)
+        self.next_button.setFixedSize(200, 50)
+
+        # Apply styles
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #CFACF4;
+            }
+            QLabel {
+                font-family: Arial;
+                font-weight: bold;
+                font-size: 18px;
+                color: #000000;
+            }
+            QComboBox {
+                background-color: #FFFFFF;
+                border-radius: 10px;
+                font-family: Arial;
+                font-size: 16px;
+                color: #000000;
+                padding: 5px;
+                border: 2px solid #9B59B6;
+                min-height: 30px;
+            }
+            QComboBox::drop-down {
+                width: 30px;
+                border: none;
+            }
+            QPushButton {
+                background-color: #4CAF50;
+                border-radius: 10px;
+                font-family: Arial;
+                font-weight: bold;
+                font-size: 18px;
+                color: #FFFFFF;
+                border: none;
+                padding: 10px 20px;
+            }
+            QPushButton:hover {
+                background-color: #45a049;
+            }
+            QPushButton:pressed {
+                background-color: #3d8b40;
+            }
+        """)
+
+
+    def go_to_order_details(self):
+        self.order_data['shape'] = self.shape_combo.currentText()
+        self.order_data['flavor'] = self.flavor_combo.currentText()
+        self.stacked_widget.setCurrentIndex(2)
+
+
+class CakeOrderForm(QWidget):
+    def __init__(self, stacked_widget, order_data):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        self.order_data = order_data
+        self.init_ui()
+
+    def init_ui(self):
+        layout = QVBoxLayout(self)
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setContentsMargins(100, 50, 100, 50)
+
+        # Title label
+        self.title_label = QLabel("Введите данные заказа")
+        self.title_label.setAlignment(Qt.AlignCenter)
+
+        # Input fields
+        self.date_label = QLabel("Дата заказа:")
+        self.date_input = QDateEdit()
+        self.date_input.setDisplayFormat("yyyy-MM-dd")
+        self.date_input.setDate(QDate.currentDate())
+
+        self.time_label = QLabel("Время получения:")
+        self.time_input = QTimeEdit()
+        self.time_input.setDisplayFormat("HH:mm")
+        self.time_input.setTime(QTime(12, 0))
+
+        self.weight_input = QLineEdit()
+        self.weight_input.setPlaceholderText("Вес торта (кг)")
+
+        self.diameter_input = QLineEdit()
+        self.diameter_input.setPlaceholderText("Диаметр/ширина (см)")
+
+        self.color_input = QLineEdit()
+        self.color_input.setPlaceholderText("Цвет торта")
+
+        # Next button
+        self.next_button = QPushButton("Далее")
+        self.next_button.clicked.connect(self.go_to_confirmation)
+
+        # Add widgets to layout
+        layout.addWidget(self.title_label)
+        layout.addSpacing(30)
+        layout.addWidget(self.date_label)
+        layout.addWidget(self.date_input)
+        layout.addSpacing(15)
+        layout.addWidget(self.time_label)
+        layout.addWidget(self.time_input)
+        layout.addSpacing(15)
+        layout.addWidget(self.weight_input)
+        layout.addSpacing(15)
+        layout.addWidget(self.diameter_input)
+        layout.addSpacing(15)
+        layout.addWidget(self.color_input)
+        layout.addSpacing(30)
+        layout.addWidget(self.next_button, alignment=Qt.AlignCenter)
+
+        # Set fixed sizes for elements
+        self.title_label.setFixedHeight(80)
+        self.date_input.setFixedHeight(40)
+        self.time_input.setFixedHeight(40)
+        self.weight_input.setFixedHeight(40)
+        self.diameter_input.setFixedHeight(40)
+        self.color_input.setFixedHeight(40)
+        self.next_button.setFixedSize(200, 50)
+
+        # Apply styles
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #CFACF4;
+            }
+            QLabel {
+                font-family: Arial;
+                font-weight: bold;
+                font-size: 18px;
+                color: #000000;
+            }
+            QLineEdit, QDateEdit, QTimeEdit {
+                background-color: #FFFFFF;
+                border-radius: 10px;
+                font-family: Arial;
+                font-size: 16px;
+                color: #000000;
+                padding: 5px 10px;
+                border: 2px solid #9B59B6;
+            }
+            QPushButton {
+                background-color: #4CAF50;
+                border-radius: 10px;
+                font-family: Arial;
+                font-weight: bold;
+                font-size: 18px;
+                color: #FFFFFF;
+                border: none;
+                padding: 10px 20px;
+            }
+            QPushButton:hover {
+                background-color: #45a049;
+            }
+            QPushButton:pressed {
+                background-color: #3d8b40;
+            }
+        """)
+
+
+    def go_to_confirmation(self):
+        if all([self.date_input.date(), self.time_input.time(),
+                self.weight_input.text(), self.diameter_input.text(),
+                self.color_input.text()]):
+            self.order_data['date'] = self.date_input.date().toString("yyyy-MM-dd")
+            self.order_data['time'] = self.time_input.time().toString("HH:mm")
+            self.order_data['weight'] = self.weight_input.text()
+            self.order_data['diameter'] = self.diameter_input.text()
+            self.order_data['color'] = self.color_input.text()
+
+            self.stacked_widget.setCurrentIndex(3)
+
+
+class ConfirmationForm(QWidget):
+    def __init__(self, stacked_widget, order_data):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        self.order_data = order_data
+        self.init_ui()
+
+    def init_ui(self):
+        layout = QVBoxLayout(self)
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setContentsMargins(100, 50, 100, 50)
+
+        # Title label
+        self.title_label = QLabel("Подтверждение заказа")
+        self.title_label.setAlignment(Qt.AlignCenter)
+
+        # Order summary
+        self.summary_text = QTextEdit()
+        self.summary_text.setReadOnly(True)
+
+        # Format order summary
+        summary = f"""
+        <h3>Данные клиента:</h3>
+        <p>Имя: {self.order_data.get('name', '')}</p>
+        <p>Телефон: {self.order_data.get('phone', '')}</p>
+        <p>Адрес: {self.order_data.get('address', '')}</p>
+
+        <h3>Параметры торта:</h3>
+        <p>Форма: {self.order_data.get('shape', '')}</p>
+        <p>Вкус: {self.order_data.get('flavor', '')}</p>
+        <p>Цвет: {self.order_data.get('color', '')}</p>
+
+        <h3>Детали заказа:</h3>
+        <p>Дата: {self.order_data.get('date', '')}</p>
+        <p>Время: {self.order_data.get('time', '')}</p>
+        <p>Вес: {self.order_data.get('weight', '')} кг</p>
+        <p>Размер: {self.order_data.get('diameter', '')} см</p>
+        """
+        self.summary_text.setHtml(summary)
+
+        # Confirm button
+        self.confirm_button = QPushButton("Подтвердить заказ")
+        self.confirm_button.clicked.connect(self.confirm_order)
+
+        # Add widgets to layout
+        layout.addWidget(self.title_label)
+        layout.addSpacing(30)
+        layout.addWidget(self.summary_text)
+        layout.addSpacing(30)
+        layout.addWidget(self.confirm_button, alignment=Qt.AlignCenter)
+
+        # Set fixed sizes for elements
+        self.title_label.setFixedHeight(80)
+        self.summary_text.setFixedHeight(400)
+        self.confirm_button.setFixedSize(200, 50)
+
+        # Apply styles
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #CFACF4;
+            }
+            QLabel {
+                font-family: Arial;
+                font-weight: bold;
+                font-size: 28px;
+                color: #000000;
+            }
+            QTextEdit {
+                background-color: #FFFFFF;
+                border-radius: 10px;
+                font-family: Arial;
+                font-size: 16px;
+                color: #000000;
+                padding: 20px;
+                border: 2px solid #9B59B6;
+            }
+            QPushButton {
+                background-color: #4CAF50;
+                border-radius: 10px;
+                font-family: Arial;
+                font-weight: bold;
+                font-size: 18px;
+                color: #FFFFFF;
+                border: none;
+                padding: 10px 20px;
+            }
+            QPushButton:hover {
+                background-color: #45a049;
+            }
+            QPushButton:pressed {
+                background-color: #3d8b40;
+            }
+        """)
+
+
+    def confirm_order(self):
+        # Сохраняем заказ
+        self.stacked_widget.window().order_history.append(self.order_data.copy())
+        self.stacked_widget.setCurrentIndex(4)  # Переходим на страницу истории
+
+
+class OrderHistoryForm(QWidget):
+    def __init__(self, stacked_widget, order_history):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        self.order_history = order_history
+        self.init_ui()
+
+    def init_ui(self):
+        layout = QVBoxLayout(self)
+        layout.setAlignment(Qt.AlignTop)
+        layout.setContentsMargins(100, 50, 100, 50)
+
+        # Title label
+        self.title_label = QLabel("История заказов")
+        self.title_label.setAlignment(Qt.AlignLeft)
+        self.title_label.setStyleSheet("""
+            font-family: Arial;
+            font-weight: bold;
+            font-size: 28px;
+            color: #000000;
+        """)
+
+        if self.order_history:
+            # Get the latest order
+            order = self.order_history[-1]
+
+            # Create a container widget for the order details
+            order_widget = QWidget()
+            order_layout = QVBoxLayout(order_widget)
+            order_layout.setContentsMargins(0, 0, 0, 0)
+
+            # Order number
+            order_number = QLabel(f"<h2>Заказ №{len(self.order_history)}</h2>")
+            order_number.setStyleSheet("""
+                font-family: Arial;
+                font-weight: bold;
+                font-size: 24px;
+                color: #000000;
+            """)
+            order_layout.addWidget(order_number)
+
+            # Main content area
+            content_widget = QWidget()
+            content_layout = QHBoxLayout(content_widget)
+            content_layout.setContentsMargins(0, 0, 0, 0)
+
+            # Left side - Image
+            image_label = QLabel()
+            pixmap = QPixmap("cake_image.png")  # Replace with your image path
+            if pixmap.isNull():
+                # If image not found, create a placeholder
+                pixmap = QPixmap(400, 300)
+                pixmap.fill(Qt.white)
+                painter = QPainter(pixmap)
+                painter.setPen(Qt.black)
+                painter.setFont(painter.font())
+                painter.drawText(pixmap.rect(), Qt.AlignCenter, "Изображение торта")
+                painter.end()
+            image_label.setPixmap(pixmap.scaled(400, 300, Qt.KeepAspectRatio))
+            content_layout.addWidget(image_label)
+
+            # Right side - Order details
+            details_widget = QWidget()
+            details_layout = QVBoxLayout(details_widget)
+            details_layout.setContentsMargins(20, 0, 0, 0)
+
+            # Format order details
+            details = QTextEdit()
+            details.setReadOnly(True)
+            details_html = f"""
+            <h3>Детали заказа:</h3>
+            <p><b>Дата:</b> {order.get('date', '')}</p>
+            <p><b>Время:</b> {order.get('time', '')}</p>
+            <p><b>Вес торта:</b> {order.get('weight', '')} кг</p>
+            <p><b>Цвет торта:</b> {order.get('color', '')}</p>
+            <p><b>Форма торта:</b> {order.get('shape', '')}</p>
+            <p><b>Диаметр торта:</b> {order.get('diameter', '')} см</p>
+            <h3>Данные клиента:</h3>
+            <p><b>Имя:</b> {order.get('name', '')}</p>
+            <p><b>Телефон:</b> {order.get('phone', '')}</p>
+            <p><b>Адрес:</b> {order.get('address', '')}</p>
+            """
+            details.setHtml(details_html)
+            details.setStyleSheet("""
+                font-family: Arial;
+                font-size: 16px;
+                background-color: #FFFFFF;
+                border-radius: 10px;
+                padding: 15px;
+                border: 2px solid #9B59B6;
+            """)
+
+            details_layout.addWidget(details)
+            content_layout.addWidget(details_widget)
+
+            # Add content to order layout
+            order_layout.addWidget(content_widget)
+
+            # New order button
+            new_order_btn = QPushButton("Сделать новый заказ")
+            new_order_btn.clicked.connect(self.new_order)
+            new_order_btn.setFixedSize(200, 50)
+            new_order_btn.setStyleSheet
