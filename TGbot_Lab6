@@ -518,4 +518,92 @@ class OrderHistoryForm(QWidget):
             new_order_btn = QPushButton("Сделать новый заказ")
             new_order_btn.clicked.connect(self.new_order)
             new_order_btn.setFixedSize(200, 50)
-            new_order_btn.setStyleSheet
+            new_order_btn.setStyleSheet("""
+                QPushButton {
+                    background-color: #4CAF50;
+                    border-radius: 10px;
+                    font-family: Arial;
+                    font-weight: bold;
+                    font-size: 18px;
+                    color: #FFFFFF;
+                    border: none;
+                    padding: 10px 20px;
+                }
+                QPushButton:hover {
+                    background-color: #45a049;
+                }
+                QPushButton:pressed {
+                    background-color: #3d8b40;
+                }
+            """)
+
+            order_layout.addWidget(new_order_btn, alignment=Qt.AlignCenter)
+            layout.addWidget(order_widget)
+        else:
+            no_orders_label = QLabel("Нет истории заказов")
+            no_orders_label.setStyleSheet("""
+                font-family: Arial;
+                font-size: 24px;
+                color: #000000;
+            """)
+            layout.addWidget(no_orders_label)
+
+        # Apply styles
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #CFACF4;
+            }
+        """)
+
+    def new_order(self):
+        self.stacked_widget.setCurrentIndex(0)
+
+
+class CakeOrderApp(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Онлайн заказ тортов")
+        self.setGeometry(100, 100, 1000, 700)
+        
+        # Central widget and layout
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        
+        # Stacked widget for multi-page interface
+        self.stacked_widget = QStackedWidget()
+        
+        # Order data dictionary
+        self.order_data = {}
+        self.order_history = []
+        
+        # Create forms
+        self.client_form = ClientDataForm(self.stacked_widget, self.order_data)
+        self.cake_form = CakeSelectionForm(self.stacked_widget, self.order_data)
+        self.order_form = CakeOrderForm(self.stacked_widget, self.order_data)
+        self.confirm_form = ConfirmationForm(self.stacked_widget, self.order_data)
+        self.history_form = OrderHistoryForm(self.stacked_widget, self.order_history)
+        
+        # Add forms to stacked widget
+        self.stacked_widget.addWidget(self.client_form)
+        self.stacked_widget.addWidget(self.cake_form)
+        self.stacked_widget.addWidget(self.order_form)
+        self.stacked_widget.addWidget(self.confirm_form)
+        self.stacked_widget.addWidget(self.history_form)
+        
+        # Main layout
+        main_layout = QVBoxLayout(central_widget)
+        main_layout.addWidget(self.stacked_widget)
+        
+        # Set application-wide styles
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color: #CFACF4;
+            }
+        """)
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = CakeOrderApp()
+    window.show()
+    sys.exit(app.exec_())
