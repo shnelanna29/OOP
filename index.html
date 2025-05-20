@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>ROT13 Шифратор</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="alphabet-block">
+            <h3>Алфавит:</h3>
+            <div id="alphabet"></div>
+        </div>
+        <div class="main-blocks">
+            <div class="block">
+                <h3 class="block-title">Исходный текст</h3>
+                <div id="input" class="text-area" contenteditable="true" spellcheck="false"></div>
+            </div>
+            <div class="block">
+                <h3 class="block-title">Зашифрованный текст</h3>
+                <div id="output" class="text-area" aria-readonly="true"></div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
