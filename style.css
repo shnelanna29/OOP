@@ -7,7 +7,7 @@ body {
 
 .container {
     width: 90%;
-    max-width: 900px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
@@ -55,4 +55,17 @@ body {
     padding: 10px;
     font-size: 16px;
     background: #f7f7f7;
+    overflow-y: auto;
+}
+
+#operations {
+    font-family: monospace;
+    white-space: pre;
+    font-size: 14px;
+    color: #333;
+}
+
+.operations-block {
+    flex: 2;
+    min-width: 300px;
 }
