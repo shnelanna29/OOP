@@ -15,9 +15,15 @@ document.getElementById('alphabet').innerText = alphabetText.trim();
   
 function rot13(text) {
     let result = '';
+    let operationsLog = "Начало шифрования ROT13:";
     let j = 0;
+    
+    operationsLog += `Исходный текст: "${text}"\n\n`;
+    
     while (j < text.length) {
         let ch = text[j];
+        operationsLog += `Обработка символа ${j+1}: '${ch}'\n`;
+        
         let found = false;
         let k = 0;
         while (k < alphabet.length) {
@@ -26,17 +32,26 @@ function rot13(text) {
                 let base = isUpper ? 0 : 26;
                 let pos = k - base;
                 let newPos = (pos + 13) % 26 + base;
+                
+                operationsLog += `  Найден в алфавите на позиции ${k}\n`;
+                operationsLog += `  Заменяем на: '${alphabet[newPos]}'\n`;
+                
                 result = result + alphabet[newPos];
                 found = true;
                 break;
             }
             k = k + 1;
         }
+        
         if (!found) {
+            operationsLog += `  Символ не найден в алфавите, оставляем как есть\n`;
             result = result + ch;
         }
-        j = j + 1;
+        
     }
+    
+    operationsLog += `Финальный результат: "${result}"\n`;
+    document.getElementById('operations').innerText = operationsLog;
     return result;
 }
   
