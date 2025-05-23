@@ -1,63 +1,50 @@
-let alphabet = [
-    'A','B','C','D','E','F','G','H','I','J','K','L','M',
-    'N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
-    'a','b','c','d','e','f','g','h','i','j','k','l','m',
-    'n','o','p','q','r','s','t','u','v','w','x','y','z'
-];
-  
-let alphabetText = '';
-let i = 0;
-while (i < alphabet.length) {
-    alphabetText = alphabetText + alphabet[i] + ' ';
-    i = i + 1;
-}
-document.getElementById('alphabet').innerText = alphabetText.trim();
-  
-function rot13(text) {
-    let result = '';
-    let operationsLog = "Начало шифрования ROT13:";
-    let j = 0;
+const alphabet = ['A','B','C','D','E','F','G','H','I','J','K','L','M',
+                 'N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+
+document.addEventListener('DOMContentLoaded', function() {
+    const userInputField = document.getElementById('userInput');
+    const resultDisplay = document.getElementById('resultDisplay');
+    const transformButton = document.getElementById('transformButton');
+    const transformationSteps = document.getElementById('transformationSteps');
     
-    operationsLog += `Исходный текст: "${text}"\n\n`;
-    
-    while (j < text.length) {
-        let ch = text[j];
-        operationsLog += `Обработка символа ${j+1}: '${ch}'\n`;
+    const alphabetInfo = document.createElement('div');
+    alphabetInfo.className = 'alphabet-info';
+    alphabetInfo.innerHTML = '<h3>Используемый алфавит:</h3><p>' + alphabet.join(' ') + '</p>';
+    document.querySelector('.container').insertBefore(alphabetInfo, transformationSteps);
+
+    function applyRot13Transformation(text) {
+        let transformedText = '';
+        transformationSteps.innerHTML = '<h3>Шаги преобразования:</h3><div class="steps-container"></div>';
+        const stepsContainer = transformationSteps.querySelector('.steps-container');
         
-        let found = false;
-        let k = 0;
-        while (k < alphabet.length) {
-            if (alphabet[k] === ch) {
-                let isUpper = k < 26;
-                let base = isUpper ? 0 : 26;
-                let pos = k - base;
-                let newPos = (pos + 13) % 26 + base;
-                
-                operationsLog += `  Найден в алфавите на позиции ${k}\n`;
-                operationsLog += `  Заменяем на: '${alphabet[newPos]}'\n`;
-                
-                result = result + alphabet[newPos];
-                found = true;
-                break;
+        for (let idx = 0; idx < text.length; idx++) {
+            const currentChar = text[idx];
+            let uppercaseChar = currentChar.toUpperCase();
+            let isLowerCase = currentChar !== uppercaseChar;
+            let transformationInfo = '';
+            
+            if (alphabet.includes(uppercaseChar)) {
+                const charIndex = alphabet.indexOf(uppercaseChar);
+                const newIndex = (charIndex + 13) % 26;
+                const newChar = alphabet[newIndex];
+                transformedText += isLowerCase ? newChar.toLowerCase() : newChar;
+                transformationInfo = `<span>${currentChar} → ${isLowerCase ? newChar.toLowerCase() : newChar}</span>`;
+            } else {
+                transformedText += currentChar;
+                continue;
             }
-            k = k + 1;
+            
+            stepsContainer.innerHTML += transformationInfo;
         }
         
-        if (!found) {
-            operationsLog += `  Символ не найден в алфавите, оставляем как есть\n`;
-            result = result + ch;
-        }
-        
+        return transformedText;
     }
-    
-    operationsLog += `Финальный результат: "${result}"\n`;
-    document.getElementById('operations').innerText = operationsLog;
-    return result;
-}
-  
-let input = document.getElementById('input');
-let output = document.getElementById('output');
-  
-input.addEventListener('input', function() {
-    output.innerText = rot13(input.innerText);
+
+    transformButton.addEventListener('click', function() {
+        if (userInputField.value.trim() === '') {
+            alert('Пожалуйста, введите текст для шифрования');
+            return;
+        }
+        resultDisplay.textContent = applyRot13Transformation(userInputField.value);
+    });
 });
