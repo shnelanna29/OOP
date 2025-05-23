@@ -2,30 +2,39 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>ROT13 Шифратор</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Шифратор ROT13</title>
+    <meta name="description" content="Онлайн инструмент для шифрования текста с помощью алгоритма ROT13">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="alphabet-block">
-            <h3>Алфавит:</h3>
-            <div id="alphabet"></div>
+    <header role="banner">
+        <h1 class="page-title">Шифратор ROT13</h1>
+    </header>
+    <main role="main">
+        <div class="main-container">
+            <div class="input-section">
+                <label for="userInput" class="visually-hidden">Текст для шифрования</label>
+                <textarea id="userInput" placeholder="Введите текст для шифрования..."></textarea>
+                <button class="action-button" id="transformButton">Зашифровать</button>
+            </div>
+            
+            <div class="result-section" aria-live="polite">
+                <h2 class="visually-hidden">Результат шифрования</h2>
+                <div id="resultDisplay"></div>
+            </div>
+            
+            <aside class="details-section" role="complementary">
+                <h3>Используемый алфавит:</h3>
+                <div id="alphabetDisplay"></div>
+                <details>
+                    <summary>Процесс шифрования</summary>
+                    <div id="transformationSteps"></div>
+                </details>
+            </aside>
         </div>
-        <div class="main-blocks">
-            <div class="block">
-                <h3 class="block-title">Исходный текст</h3>
-                <div id="input" class="text-area" contenteditable="true" spellcheck="false"></div>
-            </div>
-            <div class="block">
-                <h3 class="block-title">Зашифрованный текст</h3>
-                <div id="output" class="text-area" aria-readonly="true"></div>
-            </div>
-            <div class="block operations-block">
-                <h3 class="block-title">Операции:</h3>
-                <div id="operations" class="text-area" aria-readonly="true"></div>
-            </div>
-        </div>
-    </div>
+    </main>
     <script src="script.js"></script>
 </body>
 </html>
