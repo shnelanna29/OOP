@@ -1,71 +1,175 @@
-body {
-    background: #d3b4f3;
-    font-family: Arial;
-    margin: 0;
-    padding: 20px;
+
+:root {
+    --primary-color: #7a1fa2;
+    --primary-hover: #8e24aa;
+    --text-color: #333;
+    --bg-color: #f0f0f0;
+    --input-bg: #e8e8e8;
+    --output-bg: rgba(230, 220, 250, 0.7);
 }
 
-.container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
 }
 
-.alphabet-block {
-    background: #f5f5f5;
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 20px;
-}
-
-.alphabet-block h3 {
-    font-size: 24px;
-    margin-top: 0;
-}
-
-#alphabet {
-    font-size: 18px;
-    word-break: break-word;
-}
-
-.main-blocks {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-}
-
-.block {
-    background: #f5f5f5;
-    border-radius: 16px;
-    padding: 15px;
-    flex: 1;
-    min-width: 250px;
-}
-
-.block-title {
-    font-size: 20px;
-    margin-top: 0;
-}
-
-.text-area {
-    width: 90%;
-    height: 200px;
-    border: none;
-    border-radius: 10px;
+details {
+    margin-top: 15px;
     padding: 10px;
-    font-size: 16px;
-    background: #f7f7f7;
-    overflow-y: auto;
+    background: #f8f8f8;
+    border-radius: 5px;
 }
 
-#operations {
-    font-family: monospace;
-    white-space: pre;
-    font-size: 14px;
-    color: #333;
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 25px;
+    background-color: #f0f0f0;
 }
 
-.operations-block {
-    flex: 2;
-    min-width: 300px;
+.page-title {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 35px;
+}
+
+.main-container {
+    overflow: hidden;
+    width: 100%;
+}
+
+.input-section, .result-section {
+    width: 48%;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
+    margin-bottom: 25px;
+    box-sizing: border-box;
+}
+
+.input-section {
+    background-color: rgba(227, 250, 220, 0.724);
+    float: left;
+}
+
+.result-section {
+    background-color: rgba(227, 250, 220, 0.724);
+    float: right;
+}
+
+.details-section {
+    clear: both;
+    width: 100%;
+    margin-top: 25px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+}
+
+.input-section textarea {
+    width: 100%;
+    height: 220px;
+    padding: 18px;
+    margin: 15px 0;
+    border: none;
+    border-radius: 8px;
+    background-color: transparent;
+    font-size: 17px;
+    resize: none;
+    outline: none;
+}
+
+.result-section #resultDisplay {
+    width: 100%;
+    min-height: 220px;
+    padding: 18px;
+    margin: 15px 0;
+    border-radius: 8px;
+    background-color: transparent;
+    font-size: 17px;
+}
+
+.action-button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 15px;
+    background-color: #f4d756;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 17px;
+    transition: background-color 0.4s;
+}
+
+.action-button:hover {
+    background-color: #f4d756;
+}
+
+/* Адаптивность */
+@media (max-width: 800px) {
+    .input-section, .result-section {
+        width: 100%;
+        float: none;
+    }
+}
+
+@media (max-width: 500px) {
+    body {
+        padding: 15px;
+    }
+    
+    .page-title {
+        font-size: 26px;
+        margin-bottom: 25px;
+    }
+    
+    .input-section, .result-section {
+        padding: 18px;
+    }
+    
+    .input-section textarea, 
+    .result-section #resultDisplay {
+        height: 170px;
+        padding: 12px;
+        font-size: 15px;
+    }
+    
+    .action-button {
+        padding: 12px;
+        font-size: 15px;
+    }
+    
+    .details-section {
+        padding: 12px;
+        margin-top: 20px;
+    }
+    
+    h2, h3 {
+        font-size: 19px;
+    }
+}
+
+@media (max-width: 380px) {
+    .input-section textarea, 
+    .result-section #resultDisplay {
+        height: 140px;
+    }
+    
+    .page-title {
+        font-size: 24px;
+    }
+    
+    h2, h3 {
+        font-size: 17px;
+    }
 }
